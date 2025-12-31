@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>OmniProbe</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['Fira Code', 'monospace'],
+            },
+            colors: {
+              background: 'var(--background)',
+              foreground: 'var(--foreground)',
+              accents: {
+                1: 'var(--accents-1)',
+                2: 'var(--accents-2)',
+                3: 'var(--accents-3)',
+                4: 'var(--accents-4)',
+                5: 'var(--accents-5)',
+                6: 'var(--accents-6)',
+                7: 'var(--accents-7)',
+                8: 'var(--accents-8)',
+              },
+              success: '#0070f3',
+              error: '#ff4d4f',
+              warning: '#f5a623',
+            },
+            animation: {
+              'fade-in': 'fadeIn 0.5s ease-out forwards',
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: '0', transform: 'translateY(10px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              }
+            },
+            typography: (theme) => ({
+              DEFAULT: {
+                css: {
+                  color: 'var(--foreground)',
+                  a: {
+                    color: theme('colors.success'),
+                    '&:hover': {
+                      color: theme('colors.success'),
+                    },
+                  },
+                  code: {
+                    color: theme('colors.pink.500'),
+                    backgroundColor: 'var(--accents-1)',
+                    padding: '2px 4px',
+                    borderRadius: '4px',
+                    fontWeight: '400',
+                  },
+                  'code::before': {
+                    content: '""',
+                  },
+                  'code::after': {
+                    content: '""',
+                  },
+                  pre: {
+                    backgroundColor: 'var(--accents-1)',
+                    border: '1px solid var(--accents-2)',
+                    color: 'var(--foreground)',
+                  },
+                },
+              },
+            }),
+          },
+        },
+        plugins: [
+          // Simulated typography plugin functionality via custom CSS above
+        ]
+      };
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --background: #ffffff;
+        --foreground: #000000;
+        --accents-1: #fafafa;
+        --accents-2: #eaeaea;
+        --accents-3: #999999;
+        --accents-4: #888888;
+        --accents-5: #666666;
+        --accents-6: #444444;
+        --accents-7: #333333;
+        --accents-8: #111111;
+      }
+      .dark {
+        --background: #000000;
+        --foreground: #ffffff;
+        --accents-1: #111111;
+        --accents-2: #333333;
+        --accents-3: #444444;
+        --accents-4: #666666;
+        --accents-5: #888888;
+        --accents-6: #999999;
+        --accents-7: #eaeaea;
+        --accents-8: #fafafa;
+      }
+      body {
+        background-color: var(--background);
+        color: var(--foreground);
+        font-family: 'Inter', sans-serif;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+      /* Custom Scrollbar for Vercel feel */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--accents-3);
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--accents-4);
+      }
+      
+      /* Markdown Styles */
+      .markdown-body p { margin-bottom: 0.75em; line-height: 1.6; }
+      .markdown-body p:last-child { margin-bottom: 0; }
+      .markdown-body ul { list-style-type: disc; padding-left: 1.5em; margin-bottom: 0.75em; }
+      .markdown-body ol { list-style-type: decimal; padding-left: 1.5em; margin-bottom: 0.75em; }
+      .markdown-body h1, .markdown-body h2, .markdown-body h3 { font-weight: 600; margin-top: 1em; margin-bottom: 0.5em; }
+      .markdown-body h1 { font-size: 1.5em; }
+      .markdown-body h2 { font-size: 1.25em; }
+      .markdown-body code { font-family: 'Fira Code', monospace; font-size: 0.9em; }
+      .markdown-body pre { padding: 1em; overflow-x: auto; border-radius: 0.375rem; margin-bottom: 1em; }
+      .markdown-body blockquote { border-left: 4px solid var(--accents-3); padding-left: 1em; color: var(--accents-5); margin-bottom: 1em; }
+      .markdown-body table { width: 100%; border-collapse: collapse; margin-bottom: 1em; font-size: 0.9em; }
+      .markdown-body th, .markdown-body td { border: 1px solid var(--accents-2); padding: 0.5em; text-align: left; }
+      .markdown-body th { background-color: var(--accents-1); font-weight: 600; }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "framer-motion": "https://esm.sh/framer-motion@^12.23.26",
+    "react-markdown": "https://esm.sh/react-markdown@9.0.1",
+    "html2canvas": "https://esm.sh/html2canvas@1.4.1",
+    "jspdf": "https://esm.sh/jspdf@2.5.1",
+    "peerjs": "https://esm.sh/peerjs@1.5.2?bundle",
+    "qrcode": "https://esm.sh/qrcode@1.5.3"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>

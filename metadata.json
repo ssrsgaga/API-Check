@@ -1,0 +1,5 @@
+{
+  "name": "API Check",
+  "description": "简单、快速的大模型 API 连通性测试工具。纯前端运行，支持 OpenAI 格式，数据仅在本地存储。",
+  "requestFramePermissions": []
+}
