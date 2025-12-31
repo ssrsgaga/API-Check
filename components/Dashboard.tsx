@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Icons } from './ui/Icons';
 import { ApiConfig, Model, TestResult, ToolTestResult, ChatMessage, ToastMessage, ChatConfig, DebugInfo, GlobalSettings, ViewMode } from '../types';
 import { fetchModels, testModelLatency, testModelToolSupport, sendChatMessage, prepareChatBody } from '../services/llmService';
-import { clearLogs } from '../services/dbService';
+import { clearLogs, getAllLogs, bulkImportLogs } from '../services/dbService';
 import { ToastContainer } from './ui/Toast';
 import { PromptLibrary } from './PromptLibrary';
 import { Documentation } from './Documentation';
@@ -193,18 +193,27 @@ export const Dashboard: React.FC<DashboardProps> = ({ toggleTheme, isDark }) => 
   };
 
   // --- Handlers: Data Import/Export & Reset ---
-  const getAllDataForExport = () => {
+  const getAllDataForExport = async () => {
+    // Need to fetch logs from IndexedDB asynchronously
+    let logs = [];
+    try {
+        logs = await getAllLogs();
+    } catch (e) {
+        console.error("Failed to fetch logs for export", e);
+    }
+
     return {
         apis,
         settings: globalSettings,
         prompts: JSON.parse(localStorage.getItem('omni_prompts') || '[]'),
+        logs,
         version: 1,
         exportedAt: Date.now()
     };
   };
 
-  const handleExportData = () => {
-    const data = getAllDataForExport();
+  const handleExportData = async () => {
+    const data = await getAllDataForExport();
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -212,13 +221,16 @@ export const Dashboard: React.FC<DashboardProps> = ({ toggleTheme, isDark }) => 
     a.download = `api-check-backup-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    showToast('success', '所有数据已导出');
+    showToast('success', `数据已导出 (含 ${data.logs.length} 条日志)`);
   };
 
-  const processImportData = (data: any) => {
+  const processImportData = async (data: any) => {
     try {
       let apiCount = 0;
       let promptCount = 0;
+      let logCount = 0;
+
+      // Import APIs
       if (data.apis && Array.isArray(data.apis)) {
         setApis(prev => {
           // Merge logic: avoid duplicate IDs
@@ -228,10 +240,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ toggleTheme, isDark }) => 
           return [...prev, ...newApis];
         });
       }
+
+      // Import Settings
       if (data.settings) {
         setGlobalSettings(data.settings);
         setSettingsForm(data.settings);
       }
+
+      // Import Prompts
       if (data.prompts && Array.isArray(data.prompts)) {
         const currentPrompts = JSON.parse(localStorage.getItem('omni_prompts') || '[]');
         const existingIds = new Set(currentPrompts.map((p: any) => p.id));
@@ -239,9 +255,17 @@ export const Dashboard: React.FC<DashboardProps> = ({ toggleTheme, isDark }) => 
         promptCount = newPrompts.length;
         localStorage.setItem('omni_prompts', JSON.stringify([...currentPrompts, ...newPrompts]));
       }
-      showToast('success', `导入成功: ${apiCount} 个连接, ${promptCount} 个提示词`);
+
+      // Import Logs
+      if (data.logs && Array.isArray(data.logs)) {
+          await bulkImportLogs(data.logs);
+          logCount = data.logs.length;
+      }
+
+      showToast('success', `导入成功: ${apiCount} 连接, ${promptCount} 提示词, ${logCount} 日志`);
     } catch (e) {
-      showToast('error', '数据格式错误');
+      console.error(e);
+      showToast('error', '数据格式错误或导入失败');
     }
   };
 
@@ -249,10 +273,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ toggleTheme, isDark }) => 
     const file = event.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       try {
         const json = JSON.parse(e.target?.result as string);
-        processImportData(json);
+        await processImportData(json);
       } catch (err) {
         showToast('error', '无法解析 JSON 文件');
       }
@@ -268,7 +292,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ toggleTheme, isDark }) => 
       const res = await fetch(importUrl);
       if (!res.ok) throw new Error('网络请求失败');
       const json = await res.json();
-      processImportData(json);
+      await processImportData(json);
       setImportUrl('');
     } catch (e) {
       showToast('error', '导入失败，请检查 URL 或跨域设置');
@@ -1107,7 +1131,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ toggleTheme, isDark }) => 
                               <div className="space-y-4">
                                 <div className="grid grid-cols-2 gap-4">
                                    <button onClick={handleExportData} className="flex items-center justify-center gap-2 px-4 py-2 bg-accents-1 border border-accents-2 rounded hover:bg-accents-2 transition-colors text-sm">
-                                      <Icons.Download size={16}/> 导出配置 (JSON)
+                                      <Icons.Download size={16}/> 导出全部数据
                                    </button>
                                    <div className="relative">
                                       <input 
@@ -1141,6 +1165,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ toggleTheme, isDark }) => 
                                 >
                                     <Icons.Wifi size={16}/> 局域网 / P2P 数据互传 (扫码同步)
                                 </button>
+                                <p className="text-xs text-accents-4 text-center">
+                                    * 导入/导出/同步 现已支持操作日志、提示词库及全局设置。
+                                </p>
                               </div>
 
                               <div className="mt-8 pt-6 border-t border-accents-2">
