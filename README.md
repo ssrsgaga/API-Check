@@ -8,6 +8,8 @@ OmniProbe 是一个纯前端应用（Pure Frontend），旨在帮助开发者快
 ![React](https://img.shields.io/badge/React-19-blue)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ssrsgaga/API-Check)
+
 ## ✨ 核心特性
 
 *   **🛡️ 隐私优先**：无后端架构，你的 Key 永远只保存在你自己的浏览器里。
@@ -43,8 +45,8 @@ OmniProbe 是一个纯前端应用（Pure Frontend），旨在帮助开发者快
 1.  **克隆项目**
 
     ```bash
-    git clone https://github.com/your-username/omniprobe.git
-    cd omniprobe
+    git clone https://github.com/ssrsgaga/API-Check.git
+    cd API-Check
     ```
 
 2.  **安装依赖**
@@ -69,7 +71,7 @@ OmniProbe 是一个纯前端应用（Pure Frontend），旨在帮助开发者快
 
 由于是纯静态项目，你可以将其部署到任何静态托管服务上：
 
-*   **Vercel**: 导入仓库即可自动识别部署。
+*   **Vercel**: 点击上方的 "Deploy with Vercel" 按钮，或者导入仓库即可自动识别部署。
 *   **GitHub Pages**: 构建后上传 `dist` 目录。
 *   **Nginx / Docker**: 只需要托管构建后的静态文件。
 
