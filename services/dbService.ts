@@ -33,7 +33,7 @@ export const saveLog = async (log: RequestLog): Promise<void> => {
     const db = await openDB();
     const tx = db.transaction(STORE_NAME, 'readwrite');
     const store = tx.objectStore(STORE_NAME);
-    store.add(log);
+    store.put(log); // Use put to upsert
     return new Promise((resolve, reject) => {
       tx.oncomplete = () => resolve();
       tx.onerror = () => reject(tx.error);
@@ -77,6 +77,34 @@ export const getLogs = async (limit: number = 1000, offset: number = 0): Promise
     };
     request.onerror = () => reject(request.error);
   });
+};
+
+export const getAllLogs = async (): Promise<RequestLog[]> => {
+    const db = await openDB();
+    const tx = db.transaction(STORE_NAME, 'readonly');
+    const store = tx.objectStore(STORE_NAME);
+    
+    return new Promise((resolve, reject) => {
+        const request = store.getAll();
+        request.onsuccess = () => resolve(request.result || []);
+        request.onerror = () => reject(request.error);
+    });
+};
+
+export const bulkImportLogs = async (logs: RequestLog[]): Promise<void> => {
+    if (!logs || logs.length === 0) return;
+    const db = await openDB();
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    
+    logs.forEach(log => {
+        store.put(log); // Upsert based on ID
+    });
+
+    return new Promise((resolve, reject) => {
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+    });
 };
 
 export const clearLogs = async (): Promise<void> => {
