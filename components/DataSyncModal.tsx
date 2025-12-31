@@ -6,8 +6,8 @@ import QRCode from 'qrcode';
 
 interface DataSyncModalProps {
   onClose: () => void;
-  getDataToExport: () => any;
-  onImportData: (data: any) => void;
+  getDataToExport: () => Promise<any>;
+  onImportData: (data: any) => Promise<void>;
   showToast: (type: 'success' | 'error' | 'info', msg: string) => void;
   initialMode?: 'select' | 'send' | 'receive';
   initialPeerId?: string; // For auto-connecting
@@ -96,15 +96,21 @@ export const DataSyncModal: React.FC<DataSyncModalProps> = ({
     peer.on('connection', (conn) => {
         connRef.current = conn;
         setStatus('transferring');
-        setProgressMsg('接收端已连接，正在发送数据...');
+        setProgressMsg('接收端已连接，正在准备数据...');
 
-        conn.on('open', () => {
+        conn.on('open', async () => {
             // Send data
-            const data = getDataToExport();
-            conn.send(data);
-            showToast('success', '数据发送成功');
-            setStatus('success');
-            setProgressMsg('数据已发送！');
+            try {
+                const data = await getDataToExport();
+                setProgressMsg('正在发送数据...');
+                conn.send(data);
+                showToast('success', '数据发送成功');
+                setStatus('success');
+                setProgressMsg('数据已发送！');
+            } catch (e) {
+                setStatus('error');
+                setProgressMsg('数据准备失败');
+            }
         });
     });
 
@@ -138,9 +144,10 @@ export const DataSyncModal: React.FC<DataSyncModalProps> = ({
             setProgressMsg('连接成功，等待数据传输...');
         });
 
-        conn.on('data', (data: any) => {
+        conn.on('data', async (data: any) => {
             try {
-                onImportData(data);
+                setProgressMsg('正在导入数据...');
+                await onImportData(data);
                 setStatus('success');
                 setProgressMsg('数据接收并导入成功！');
                 showToast('success', '导入成功');
@@ -193,10 +200,21 @@ export const DataSyncModal: React.FC<DataSyncModalProps> = ({
         <div className="p-6 min-h-[300px] flex flex-col">
             {mode === 'select' && (
                 <div className="flex flex-col gap-4 flex-1 justify-center">
-                    <p className="text-sm text-accents-5 text-center mb-4">
-                        通过 P2P 技术在不同设备间快速同步所有配置和数据。<br/>
-                        <span className="text-xs opacity-70">请确保两台设备处于同一网络下，或公网可访问。</span>
-                    </p>
+                    <div className="text-sm text-accents-5 text-center mb-2 space-y-2">
+                        <p>通过 P2P 技术在不同设备间快速同步配置。</p>
+                        <div className="inline-block bg-accents-1 border border-accents-2 rounded px-3 py-2 text-xs text-left">
+                            <div className="font-semibold text-accents-6 mb-1">同步内容包括:</div>
+                            <ul className="list-disc list-inside space-y-0.5 text-accents-5">
+                                <li>API 连接列表 & Keys</li>
+                                <li>全局设置 (超时、并发等)</li>
+                                <li>提示词库 (Prompts)</li>
+                                <li><span className="font-bold text-foreground">全部操作日志 (Logs)</span></li>
+                            </ul>
+                            <div className="mt-1.5 pt-1.5 border-t border-accents-2 text-[10px] text-accents-4">
+                                * 聊天记录暂不支持同步 (仅本地缓存)
+                            </div>
+                        </div>
+                    </div>
                     <button 
                         onClick={startSend}
                         className="flex items-center gap-4 p-4 border border-accents-2 rounded-xl hover:border-success hover:bg-green-50/50 transition-all group text-left"
