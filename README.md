@@ -10,6 +10,8 @@ OmniProbe 是一个纯前端应用（Pure Frontend），旨在帮助开发者快
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ssrsgaga/API-Check)
 
+API Check Demo：https://apicheck.96ai.top/
+
 ## ✨ 核心特性
 
 *   **🛡️ 隐私优先**：无后端架构，你的 Key 永远只保存在你自己的浏览器里。
@@ -102,3 +104,4 @@ OmniProbe 是一个纯前端应用（Pure Frontend），旨在帮助开发者快
 ## 📄 许可证
 
 MIT License. 所有的代码都是开源的，你可以随意修改和分发。
+
