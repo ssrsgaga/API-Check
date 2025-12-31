@@ -124,17 +124,28 @@ export const Documentation: React.FC<DocumentationProps> = ({ isOpen, onClose, i
                 </div>
                 <div>
                    <h3 className="text-xl font-bold text-foreground">Developed by Linux Do 三文鱼</h3>
-                   <a 
-                     href="https://linux.do/u/462642146/summary" 
-                     target="_blank" 
-                     rel="noopener noreferrer"
-                     className="inline-flex items-center gap-2 mt-3 text-success hover:underline font-medium"
-                   >
-                     <Icons.ExternalLink size={16} /> 访问开发者主页
-                   </a>
+                   
+                   <div className="flex justify-center gap-4 mt-4 flex-wrap">
+                      <a 
+                        href="https://github.com/ssrsgaga/API-Check" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-foreground text-background rounded-full text-sm font-bold hover:opacity-90 transition-opacity shadow-md"
+                      >
+                        <Icons.ExternalLink size={16} /> GitHub 仓库
+                      </a>
+                      <a 
+                        href="https://linux.do/u/462642146/summary" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-accents-2 border border-accents-3 text-foreground rounded-full text-sm font-medium hover:bg-accents-3 transition-colors"
+                      >
+                        <Icons.ExternalLink size={16} /> 开发者主页
+                      </a>
+                   </div>
                 </div>
-                <p className="text-sm text-accents-5 max-w-md mx-auto">
-                   致力于构建好用的本地化开发者工具。如果您觉得好用，欢迎分享给朋友。
+                <p className="text-sm text-accents-5 max-w-md mx-auto mt-2">
+                   致力于构建好用的本地化开发者工具。如果您觉得好用，欢迎 Star 并在 Github 上提交 Issue。
                 </p>
              </div>
           </section>
